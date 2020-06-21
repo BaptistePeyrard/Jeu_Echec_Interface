@@ -1,0 +1,2 @@
+C:\Users\babat\source\repos\echec_graph\Debug\echec_graph.exe
+C:\Users\babat\source\repos\echec_graph\Debug\echec_graph.pdb
