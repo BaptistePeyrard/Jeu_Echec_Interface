@@ -3034,10 +3034,10 @@ int minmax(string grille[], string grille_couleur[], int numero_return)
 
     string grille_simulation[64];
     string grille_simulation_couleur[64];
-    string save1[64];       //save1 = sauvegarde pour réinitialiser la grille simulation dans la boucle for des pieces noires
-    string save1_couleur[64];
-    string save2[64];       //save2 = sauvegarde pour réinitialiser la grille simulation dans la boucle for des pieces blanches
-    string save2_couleur[64];
+    string save1[3][64];       //save1 = sauvegarde pour réinitialiser la grille simulation dans la boucle for des pieces noires
+    string save1_couleur[3][64];
+    string save2[3][64];       //save2 = sauvegarde pour réinitialiser la grille simulation dans la boucle for des pieces blanches
+    string save2_couleur[3][64];
 
     for (int i = 0; i < 64; i++) {  //on initialise les nouvelles grilles qui serviront a prevoir plusieurs tours
         grille_simulation[i] = grille[i];
@@ -3045,145 +3045,200 @@ int minmax(string grille[], string grille_couleur[], int numero_return)
     }
 
     for (int i = 0; i < 64; i++) {  //on initialise les grilles de sauvegarde qui permettent de comparer si les pieces prisent precedemment sont rentables par rapport a la piece qui a été perdue
-        save1[i] = grille_simulation[i];
-        save1_couleur[i] = grille_simulation_couleur[i];
+        save1[0][i] = grille[i];
+        save1_couleur[0][i] = grille_couleur[i];
     }
 
+    for (int tour = 0; tour < 3; tour++) {  //on regarde pour 3 tours en avance
+
+
+        if (tour != 0) {
+            //on a initialisé save1 avec la grille pour le premier tour mais pour le tour 2 et 3 il faut prendre save1 à partir de la grille simulation apres les deplacements
+
+
+            for (int i = 0; i < 64; i++) {  //on initialise les grilles de sauvegarde qui permettent de comparer si les pieces prisent precedemment sont rentables par rapport a la piece qui a été perdue
+                save1[tour][i] = grille_simulation[i];
+                save1_couleur[tour][i] = grille_simulation_couleur[i];
+            }
+        }
+
+        for (int i = 0; i < 64; i++) {  //On commence par MAX (regarder le potentiel des déplacements 
+
+            if (grille_simulation_couleur[i] == "noir") { //on va tester toutes les pieces noirs
 
 
 
-    for (int i = 0; i < 64; i++) {  //On commence par MAX (regarder le potentiel des déplacements 
+                for (int y = 0; y < 64; y++) {  //on va regarder toutes les cases
 
-        if (grille_simulation_couleur[i] == "noir") { //on va tester toutes les pieces noirs
-
-
-
-            for (int y = 0; y < 64; y++) {  //on va regarder toutes les cases
-
-                for (int i = 0; i < 64; i++) {  //on initialise les nouvelles grilles qui serviront a prevoir plusieurs tours
-                    grille_simulation[i] = grille[i];
-                    grille_simulation_couleur[i] = grille_couleur[i];
-                }
-
-
-
-
-                int verif = verification_J2(save1, save1_couleur, i, y);  //verif avec la piece choisie (i) et la case choisie (y)
-
-
-
-
-                if (verif == 1) {   // le deplacement est possible de la case i à la case y
-
-
-                    if (grille_simulation[y] == "RoB") {
-                        value[i][y] = value[i][y] + 100;    //Pour favoriser les mises en echec ou la victoire
-                                                            //+100 = on prend le roi
-                    }
-                    else if (grille_simulation_couleur[y] == "blanc") {    //Pour favoriser la prise d'une piece
-                        value[i][y] = value[i][y] + 50; //+10 = on prend une piece
-                    }
-                    else if (grille_couleur[y] == "aucune") {
-                        value[i][y] = value[i][y] + 5;  //le potentiel n'augmente pas si on ne prend aucune piece ennemie
-                                                        //+0 = on ne prend rien
-                    }
-
-                    deplacement(grille_simulation, grille_simulation_couleur, i, y, 1);
-
-                    int vicN = VerifVictoire_Simulation(grille_simulation);  //on verifie si l'ia a gagné dans la simulation (si oui alors il faut prendre ce chemin)
-
-                    int meeN = VerifMiseEnEchec_Simulation(grille_simulation, grille_simulation_couleur);   //on vérifie si le roi blanc est mis en echec (si oui il faut prendre ce chemin si l'ia ne gagne pas ailleurs)
-
-                    if (vicN == 1) {
-                        value[i][y] = value[i][y] + 5000;   //+5000 = victoire
-                    }
-
-                    if (meeN == 1) {
-                        value[i][y] = value[i][y] + 3000;   //+3000 = mise en echec
+                    for (int i = 0; i < 64; i++) {  //on initialise les nouvelles grilles qui serviront a prevoir plusieurs tours
+                        grille_simulation[i] = grille[i];
+                        grille_simulation_couleur[i] = grille_couleur[i];
                     }
 
 
-                    for (int i = 0; i < 64; i++) {  //on initialise les grilles de sauvegarde qui permettent de réinitialiser grille simulation dans la boucle for des pieces blanches
-                        save2[i] = grille_simulation[i];
-                        save2_couleur[i] = grille_simulation_couleur[i];
-                    }
 
 
-                    for (int w = 0; w < 64; w++) {  //On va maitenant vérifier le risque en faisant le MIN
 
-
-                        for (int v = 0; v < 64; v++) {  //on va regarder toutes les cases
+                    int verif = verification_J2(save1[tour], save1_couleur[tour], i, y);  //verif avec la piece choisie (i) et la case choisie (y)
 
 
 
 
-                            if (grille_simulation_couleur[w] == "blanc") { //on va tester toutes les pieces blanches
-
-                                int verif = verification_J1(save2, save2_couleur, w, v);  //verif avec la piece blanche choisie (w) et la piece noire qui vient de se déplacer (y)
-
-                                if (verif == 1) {   // le deplacement est possible de la case w à la case i
-
-                                    //la piece blanche a la possibilité d'éliminer la piece noire joué precedemment
-
-                                    if (grille_simulation_couleur[v] == "noir") {    //Si la pièce noire avait éliminé une piece blanche au tour precedent, on vérifit que ça vallait le coup de se faire éliminer juste apres
-
-                                        int c = Valeur_Piece(grille_simulation, v) - Valeur_Piece(save1, y);
-                                        if (c > 0) {
-                                            //si la valeur de la piece noire est plus grande que la valeur de la piece blanche
-                                            value[i][y] = value[i][y] - 90; //-90 = on prend une piece mais on perd la notre et on perd l'echange
-                                        }
-                                        else if (c == 0) {
-                                            value[i][y] = value[i][y] - 10; //-5 = on prend une piece mais on perd la notre et on a un echange neutre
-                                        }
-                                        else {
-                                            //la valeur de la piece noire est inférieure à la valeur de la piece blanche éliminée precedemment : c'est donc rentable
-                                            value[i][y] = value[i][y] - 5; //-10 = on prend une piece mais on perd la notre et on gagne l'echange
-                                        }
+                    if (verif == 1) {   // le deplacement est possible de la case i à la case y
 
 
 
-                                    }
-
-                                    deplacement(grille_simulation, grille_simulation_couleur, w, v, 1);
-
-                                    int vicB = VerifVictoire_Simulation(grille_simulation);  //on verifie si l'ia a perdu dans la simulation (si oui alors il faut éviter ce chemin)
-
-                                    int meeB = VerifMiseEnEchec_Simulation(grille_simulation, grille_simulation_couleur);   //on vérifie si le roi noir est mis en echec (si oui il faut éviter ce chemin si l'ia ne perd pas ailleurs)
-
-                                    if (vicB == 2) {
-                                        value[i][y] = value[i][y] - 4000;   //-4000 = défaite de l'IA
-                                    }
-
-                                    if (meeB == 2) {
-                                        value[i][y] = value[i][y] - 2000;   //-2000 = mise en echec
-                                    }
 
 
 
-                                }
-                                else {
-                                    //La piece noire ne se fait pas éliminée
-                                    value[i][y] = value[i][y] - 0;
-                                }
-
-                            }// la piece n'est pas blanche : il ne se passe rien
-
+                        if (grille_simulation[y] == "RoB") {
+                            value[i][y] = value[i][y] + 100;    //Pour favoriser les mises en echec ou la victoire
+                                                                //+100 = on prend le roi
+                        }
+                        else if (grille_simulation_couleur[y] == "blanc") {    //Pour favoriser la prise d'une piece
+                            value[i][y] = value[i][y] + 50; //+10 = on prend une piece
+                        }
+                        else if (grille_couleur[y] == "aucune") {
+                            value[i][y] = value[i][y] + 5;  //le potentiel n'augmente pas si on ne prend aucune piece ennemie
+                                                            //+0 = on ne prend rien
                         }
 
-                    }  //fin boucle for des pieces blanches
+                        deplacement(grille_simulation, grille_simulation_couleur, i, y, 1);
 
-                }
-                else {
-                    //Deplacement impossible
-                    value[i][y] = -1000;
-                }
+                        int vicN = VerifVictoire_Simulation(grille_simulation);  //on verifie si l'ia a gagné dans la simulation (si oui alors il faut prendre ce chemin)
 
-            }   //fin boucle for pour les possibilités de mouvement
+                        int meeN = VerifMiseEnEchec_Simulation(grille_simulation, grille_simulation_couleur);   //on vérifie si le roi blanc est mis en echec (si oui il faut prendre ce chemin si l'ia ne gagne pas ailleurs)
 
-        }   // la piece n'est pas noir : il ne se passe rien
+                        if (vicN == 1) {
+                            value[i][y] = value[i][y] + 5000;   //+5000 = victoire
+                        }
 
-    }   //fin boucle for des pieces noirs
+                        if (meeN == 1) {
+                            value[i][y] = value[i][y] + 3000;   //+3000 = mise en echec
+                        }
 
+
+                        for (int i = 0; i < 64; i++) {  //on initialise les grilles de sauvegarde qui permettent de réinitialiser grille simulation dans la boucle for des pieces blanches
+                            save2[tour][i] = grille_simulation[i];
+                            save2_couleur[tour][i] = grille_simulation_couleur[i];
+                        }
+
+
+                        for (int w = 0; w < 64; w++) {  //On va maitenant vérifier le risque en faisant le MIN
+
+                            for (int v = 0; v < 64; v++) {  //on va regarder toutes les cases
+
+                                if (grille_simulation_couleur[w] == "blanc") { //on va tester toutes les pieces blanches
+
+                                    int verif = verification_J1(save2[tour], save2_couleur[tour], w, v);  //verif avec la piece blanche choisie (w) et la piece noire qui vient de se déplacer (y)
+
+                                    if (verif == 1) {   // le deplacement est possible de la case w à la case i
+
+                                        //la piece blanche a la possibilité d'éliminer la piece noire joué precedemment
+
+                                        if (grille_simulation_couleur[v] == "noir") {    //Si la pièce noire avait éliminé une piece blanche au tour precedent, on vérifit que ça vallait le coup de se faire éliminer juste apres
+
+                                            int c = Valeur_Piece(grille_simulation, v) - Valeur_Piece(save1[tour], y);
+                                            if (c > 0) {
+                                                //si la valeur de la piece noire est plus grande que la valeur de la piece blanche
+                                                value[i][y] = value[i][y] - 90; //-90 = on prend une piece mais on perd la notre et on perd l'echange
+                                            }
+                                            else if (c == 0) {
+                                                value[i][y] = value[i][y] - 10; //-5 = on prend une piece mais on perd la notre et on a un echange neutre
+                                            }
+                                            else {
+                                                //la valeur de la piece noire est inférieure à la valeur de la piece blanche éliminée precedemment : c'est donc rentable
+                                                value[i][y] = value[i][y] - 5; //-10 = on prend une piece mais on perd la notre et on gagne l'echange
+                                            }
+
+
+
+                                        }
+
+                                        deplacement(grille_simulation, grille_simulation_couleur, w, v, 1);
+
+                                        int vicB = VerifVictoire_Simulation(grille_simulation);  //on verifie si l'ia a perdu dans la simulation (si oui alors il faut éviter ce chemin)
+
+                                        int meeB = VerifMiseEnEchec_Simulation(grille_simulation, grille_simulation_couleur);   //on vérifie si le roi noir est mis en echec (si oui il faut éviter ce chemin si l'ia ne perd pas ailleurs)
+
+                                        if (vicB == 2) {
+                                            value[i][y] = value[i][y] - 4000;   //-4000 = défaite de l'IA
+                                        }
+
+                                        if (meeB == 2) {
+                                            value[i][y] = value[i][y] - 2000;   //-2000 = mise en echec
+                                        }
+
+
+                                        //Probleme : si nous sommes au deuxieme tour de simulation, la valeur de ces chemins doit etre attribué au chemin du premier tour (car on part du principe que ce 1er tour a deja ete joué)
+
+
+
+                                        if (tour != 0) {    //pour donner la valeur au chemin initial qui a permit de simuler ce second chemin
+
+                                            for (int s = 0; s < 64; s++) {
+
+                                                if (tour == 1) {
+
+                                                    if (value[s][i] > 0) {    //si le chemin était deja envisagé un ou plusieurs tours avant
+
+                                                        value[s][i] = value[s][i] + value[i][y];    //on attribue à la valeur du chemin initial sa valeur + les valeurs de ses futurs chemins
+
+                                                    }
+
+                                                }
+                                                else if (tour == 2) {
+
+                                                    for (int m = 0; m < 64; m++) {
+
+                                                        if (value[s][i] > 0) {    //si le chemin était deja envisagé un ou plusieurs tours avant
+
+                                                            value[s][i] = value[s][i] + value[i][y];    //on attribue à la valeur du chemin initial sa valeur + les valeurs de ses futurs chemins
+
+                                                            if (value[m][s] > 0) {
+
+                                                                value[m][s] = value[m][s] + value[s][i];
+
+
+
+                                                            }//fin if
+
+
+                                                        }//fin if
+
+                                                    }//fin boucle for pour m
+
+                                                }//fin if
+
+                                            }//fin boucle for pour s
+
+                                        }//fin boucle for pour 3 tours
+
+                                    }
+                                    else {
+                                        //La piece noire ne se fait pas éliminée
+                                        value[i][y] = value[i][y] - 0;
+                                    }
+
+                                }// la piece n'est pas blanche : il ne se passe rien
+
+                            }//fin boucle for pour v 
+
+                        }  //fin boucle for des pieces blanches
+
+                    }
+                    else {
+                        //Deplacement impossible
+                        value[i][y] = -1000;
+                    }
+
+                }   //fin boucle for pour les possibilités de mouvement
+
+            }   // la piece n'est pas noir : il ne se passe rien
+
+        }   //fin boucle for des pieces noirs
+    
+    }   //fin boucle for contenant tour
 
     int max = -200;
     int valeur_i = 0;

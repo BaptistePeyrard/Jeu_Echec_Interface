@@ -4,6 +4,6 @@ C:\Users\babat\source\repos\echec_graph\main.cpp(2839,29): warning C4552: '>' :
 C:\Users\babat\source\repos\echec_graph\main.cpp(97): warning C4715: 'SDL_main' : les chemins de contrôle ne retournent pas tous une valeur
 C:\Users\babat\source\repos\echec_graph\main.cpp(1324): warning C4715: 'conversion' : les chemins de contrôle ne retournent pas tous une valeur
 C:\Users\babat\source\repos\echec_graph\main.cpp(2762): warning C4715: 'verification_J2' : les chemins de contrôle ne retournent pas tous une valeur
-C:\Users\babat\source\repos\echec_graph\main.cpp(3296): warning C4715: 'VerifVictoire_Simulation' : les chemins de contrôle ne retournent pas tous une valeur
 C:\Users\babat\source\repos\echec_graph\main.cpp(3212): warning C4715: 'minmax' : les chemins de contrôle ne retournent pas tous une valeur
+C:\Users\babat\source\repos\echec_graph\main.cpp(3296): warning C4715: 'VerifVictoire_Simulation' : les chemins de contrôle ne retournent pas tous une valeur
   echec_graph.vcxproj -> C:\Users\babat\source\repos\echec_graph\Debug\echec_graph.exe
